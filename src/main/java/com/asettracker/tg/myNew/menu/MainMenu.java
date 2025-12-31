@@ -28,17 +28,35 @@ public class MainMenu implements MenuProvider, ButtonHandler {
     }
 
     public Map<String, InlineKeyboardButton> getMenuButtons() {
-        return Map.of(
+        return Map.ofEntries(
+                getViewBagButton(),
+                getViewProfileButton(),
+                getRandomNumberButton()
+        );
+    }
+
+    public Map.Entry<String, InlineKeyboardButton> getViewBagButton() {
+        return Map.entry(
                 VIEW_BAG_BUTTON,
                 InlineKeyboardButton.builder()
                         .text("my bag")
                         .callbackData(VIEW_BAG_BUTTON)
-                        .build(),
+                        .build()
+        );
+    }
+
+    public Map.Entry<String, InlineKeyboardButton> getViewProfileButton() {
+        return Map.entry(
                 VIEW_PROFILE_BUTTON,
                 InlineKeyboardButton.builder()
                         .text("my profile")
                         .callbackData(VIEW_PROFILE_BUTTON)
-                        .build(),
+                        .build()
+        );
+    }
+
+    public Map.Entry<String, InlineKeyboardButton> getRandomNumberButton() {
+        return Map.entry(
                 RANDOM_NUMBER_BUTTON,
                 InlineKeyboardButton.builder()
                         .text("random number")
