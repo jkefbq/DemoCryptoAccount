@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: tg-bot
+  output:
+    ansi:
+      enabled: ALWAYS
+server:
+  port: 8083
