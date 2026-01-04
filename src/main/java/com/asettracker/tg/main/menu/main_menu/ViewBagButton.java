@@ -1,29 +1,23 @@
 package com.asettracker.tg.main.menu.main_menu;
 
-import com.asettracker.tg.main.dto.MyTelegramClient;
 import com.asettracker.tg.main.menu.bag_menu.BagMenu;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Component
+@AllArgsConstructor
 public class ViewBagButton implements IMainMenuButton {
 
     private static final String VIEW_BAG_CALLBACK_DATA = "viewBag";
-    private final TelegramClient telegramClient;
     private final BagMenu bagMenu;
-
-    public ViewBagButton(MyTelegramClient myTelegramClient, BagMenu bagMenu) {
-        this.telegramClient = myTelegramClient.getTelegramClient();
-        this.bagMenu = bagMenu;
-    }
 
     @Override
     public InlineKeyboardButton getButton() {
         return InlineKeyboardButton.builder()
-                .text("my bag")
+                .text("Мой портфель")
                 .callbackData(VIEW_BAG_CALLBACK_DATA)
                 .build();
     }

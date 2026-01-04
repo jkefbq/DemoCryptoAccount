@@ -1,10 +1,10 @@
 package com.asettracker.tg.main.menu.bag_menu;
 
+import com.asettracker.tg.main.config.ChatId;
 import com.asettracker.tg.main.database.entity.BagEntity;
-import com.asettracker.tg.main.database.entity.TelegramIdEntity;
 import com.asettracker.tg.main.database.service.BagDbService;
-import com.asettracker.tg.main.dto.MyTelegramClient;
 import com.asettracker.tg.main.menu.IMenu;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Component
+@RequiredArgsConstructor
 public class BagMenu implements IMenu {
 
     private static final String MENU_TEXT = getMenuText();
@@ -24,12 +25,6 @@ public class BagMenu implements IMenu {
     private final TelegramClient telegramClient;
     private final List<IBagMenuButton> buttons;
     private final BagDbService bagDbService;
-
-    public BagMenu(MyTelegramClient myTelegramClient, List<IBagMenuButton> buttons, BagDbService bagDbService) {
-        this.telegramClient = myTelegramClient.getTelegramClient();
-        this.buttons = buttons;
-        this.bagDbService = bagDbService;
-    }
 
     public static String getMenuText() {
         return """
@@ -53,7 +48,7 @@ public class BagMenu implements IMenu {
         //todo кэширование
         CompletableFuture<BagEntity> bag = getBagAsync(update);
         SendPhoto sendPhoto = SendPhoto.builder()
-                .chatId(update.getCallbackQuery().getFrom().getId())
+                .chatId(ChatId.get(update))
                 .photo(MENU_PHOTO)
                 .caption(String.format(MENU_TEXT, bag.get().getCreatedAt(),
                         bag.get().getAssetCount(), bag.get().getTotalCost()))
@@ -64,7 +59,7 @@ public class BagMenu implements IMenu {
 
     public CompletableFuture<BagEntity> getBagAsync(Update update) {
         return CompletableFuture.supplyAsync(() ->
-                bagDbService.findBagByTelegramId(new TelegramIdEntity(update.getCallbackQuery().getFrom().getId()))
+                bagDbService.findBagByChatId(ChatId.get(update))
                         .orElseThrow()
         );
     }
