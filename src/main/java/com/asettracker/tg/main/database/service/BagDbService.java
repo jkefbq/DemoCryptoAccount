@@ -4,10 +4,8 @@ import com.asettracker.tg.main.database.entity.BagEntity;
 import com.asettracker.tg.main.database.repository.BagRepository;
 import com.asettracker.tg.main.menu.asset_list_menu.UserChoose;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +13,8 @@ import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @Transactional
-@EnableCaching
 @AllArgsConstructor
 public class BagDbService {
 
@@ -53,6 +49,7 @@ public class BagDbService {
     public void actualizeBagFields(Long chatId) {
         BagEntity bag = findBagByChatId(chatId).orElseThrow();
         bag.setAssetCount(bag.getAssets().size());
+
         //todo строка ниже просто считает кол-во, нужно дергать другой сервис
         var totalCost = bag.getAssets().values().stream().mapToDouble(e -> e).sum();
         bag.setTotalCost(new BigDecimal(totalCost));

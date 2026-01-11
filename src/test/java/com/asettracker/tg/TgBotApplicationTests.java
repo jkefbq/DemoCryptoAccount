@@ -1,4 +1,4 @@
-package com.asettracker.tg_bot;
+package com.asettracker.tg;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

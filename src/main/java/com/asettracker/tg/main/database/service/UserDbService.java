@@ -7,7 +7,6 @@ import com.asettracker.tg.main.database.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +15,12 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Transactional
-@EnableCaching
 public class UserDbService {
 
     private static final String CACHE_NAMES = "users";
     private final UserRepository userRepo;
 
-    public void createUserAndBag(UserEntity user, BagEntity bag) {
+    public void setUserBag(UserEntity user, BagEntity bag) {
         user.setBag(bag);
         userRepo.save(user);
     }

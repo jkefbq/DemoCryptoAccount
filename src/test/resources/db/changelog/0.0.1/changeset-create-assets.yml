@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-assets
+      author: slava
+      changes:
+        - createTable:
+            tableName: assets
+            columns:
+              - column:
+                  name: asset_key
+                  type: varchar
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: asset_value
+                  type: real
+              - column:
+                  name: bag_id
+                  type: uuid

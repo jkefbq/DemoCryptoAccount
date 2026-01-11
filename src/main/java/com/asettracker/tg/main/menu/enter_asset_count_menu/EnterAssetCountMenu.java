@@ -1,7 +1,6 @@
 package com.asettracker.tg.main.menu.enter_asset_count_menu;
 
 import com.asettracker.tg.main.database.service.BagDbService;
-import com.asettracker.tg.main.database.service.UserDbService;
 import com.asettracker.tg.main.menu.IMenu;
 import com.asettracker.tg.main.menu.asset_list_menu.UserChoose;
 import com.asettracker.tg.main.service.ChatId;
@@ -19,7 +18,6 @@ public class EnterAssetCountMenu implements IMenu {
 
     private final TelegramClient telegramClient;
     private final BagDbService bagDbService;
-    private final UserDbService userDbService;
     private final UserChoose userChoose;
 
     @SneakyThrows
@@ -33,12 +31,8 @@ public class EnterAssetCountMenu implements IMenu {
     }
 
     public void addAssetAndSendSuccess(Update update) {
-        addAssetToBag(update);
-        sendSuccess(update);
-    }
-
-    public void addAssetToBag(Update update) {
         bagDbService.addAsset(userChoose, ChatId.get(update));
+        sendSuccess(update);
     }
 
     @SneakyThrows

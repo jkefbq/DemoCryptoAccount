@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.Serializable;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @Table(name = "bags")
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor
 public class BagEntity implements Serializable {
 
@@ -34,8 +36,10 @@ public class BagEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
+    @Setter
     private Long chatId;
 
+    @Setter
     @Column(name = "created_at")
     private LocalDate createdAt;
 
@@ -51,12 +55,21 @@ public class BagEntity implements Serializable {
     @CollectionTable(name = "assets", joinColumns = @JoinColumn(name = "bag_id"))
     @MapKeyColumn(name = "asset_key")
     @Column(name = "asset_value")
-    private Map<String, Double> assets = new HashMap<>();
+    private Map<String, Double> assets;
 
     public BagEntity(Update update) {
         this.createdAt = LocalDate.now();
         this.totalCost = BigDecimal.ZERO;
         this.assetCount = 0;
         this.chatId = ChatId.get(update);
+        this.assets = new HashMap<>();
+    }
+
+    public BagEntity(Long chatId) {
+        this.createdAt = LocalDate.now();
+        this.totalCost = BigDecimal.ZERO;
+        this.assetCount = 0;
+        this.chatId = chatId;
+        this.assets = new HashMap<>();
     }
 }

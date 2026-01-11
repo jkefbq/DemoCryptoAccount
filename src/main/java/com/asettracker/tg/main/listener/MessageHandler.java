@@ -79,7 +79,7 @@ public class MessageHandler {
     @Transactional
     private void createUserAndBag(Update update) {
         if (!userDbService.hasUserByChatId(ChatId.get(update))) {
-            userDbService.createUserAndBag(
+            userDbService.setUserBag(
                     new UserEntity(update),
                     bagDbService.createBag(new BagEntity(update))
             );

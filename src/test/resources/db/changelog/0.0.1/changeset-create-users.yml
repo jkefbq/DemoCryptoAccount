@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users
+      author: slava
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: chat_id
+                  type: bigint
+              - column:
+                  name: first_name
+                  type: varchar(35)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(45)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(45)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bag_id
+                  type: uuid
+              - column:
+                  name: status
+                  type: varchar
+  - changeSet:
+      id: add_bags_bag_id_FK
+      author: slava
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: users
+            baseColumnNames: bag_id
+            constraintName: bags_bag_id_FK
+            referencedTableName: bags
+            referencedColumnNames: id

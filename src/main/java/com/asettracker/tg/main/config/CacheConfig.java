@@ -1,51 +1,67 @@
 package com.asettracker.tg.main.config;
 
-import com.asettracker.tg.main.database.entity.BagEntity;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
 @Configuration
+@EnableCaching
 public class CacheConfig {
 
     @Bean
+    GenericJackson2JsonRedisSerializer jsonRedisSerializer() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+        return new GenericJackson2JsonRedisSerializer(objectMapper);
+    }
+
+    @Bean
     public RedisTemplate<String, Object> redisBagEntityTemplate(
-            RedisConnectionFactory redisConnectionFactory
+            RedisConnectionFactory redisConnectionFactory,
+            GenericJackson2JsonRedisSerializer jsonSerializer
     ) {
-        var redisTemplate = new RedisTemplate<String, Object>();
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(RedisSerializer.java());
+        redisTemplate.setValueSerializer(jsonSerializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(jsonSerializer);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
     @Bean
+    @Primary
     public CacheManager cacheManager(
             RedisConnectionFactory redisConnectionFactory,
-            ObjectMapper objectMapper
+            GenericJackson2JsonRedisSerializer jsonSerializer
     ) {
-        var jsonSerializer = new JacksonJsonRedisSerializer<>(objectMapper, BagEntity.class);
-
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(2))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.java()));
-        return RedisCacheManager.builder()
+                .disableCachingNullValues()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer));
+        return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(config)
-                .transactionAware()
-                .cacheWriter(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
                 .build();
     }
 }
