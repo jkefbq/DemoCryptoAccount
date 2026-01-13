@@ -1,10 +1,11 @@
 package com.asettracker.tg.main.listener;
 
+import com.asettracker.tg.main.database.UserStatus;
+import com.asettracker.tg.main.database.dto.BagDto;
 import com.asettracker.tg.main.database.entity.BagEntity;
 import com.asettracker.tg.main.database.entity.UserEntity;
 import com.asettracker.tg.main.database.service.BagDbService;
 import com.asettracker.tg.main.database.service.UserDbService;
-import com.asettracker.tg.main.database.UserStatus;
 import com.asettracker.tg.main.menu.asset_list_menu.UserChoose;
 import com.asettracker.tg.main.menu.bag_menu.BagMenu;
 import com.asettracker.tg.main.menu.enter_asset_count_menu.EnterAssetCountMenu;
@@ -17,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+import java.math.BigDecimal;
 
 @Component
 @AllArgsConstructor
@@ -39,7 +42,7 @@ public class MessageHandler {
             case "/bag" -> bagMenu.sendMenu(update);
             default -> {
                 if (isUserWaitingNumberStatus(update)) {
-                    userChoose.setCoinCount(Double.parseDouble(text));
+                    userChoose.setCoinCount(BigDecimal.valueOf(Double.parseDouble(text)));
                     enterAssetCountMenu.addAssetAndSendSuccess(update);
                     userDbService.findByChatId(ChatId.get(update))
                             .ifPresent(user -> userDbService.setStatus(user, UserStatus.FREE));
@@ -73,16 +76,16 @@ public class MessageHandler {
     @Transactional
     private void handleStartMsg(Update update) {
         mainMenu.sendMenu(update);
-        new Thread(() -> createUserAndBag(update)).start();
+        if (!userDbService.hasUserByChatId(ChatId.get(update))) {
+            new Thread(() -> createUserAndBag(update)).start();
+        }
     }
 
     @Transactional
     private void createUserAndBag(Update update) {
-        if (!userDbService.hasUserByChatId(ChatId.get(update))) {
-            userDbService.setUserBag(
-                    new UserEntity(update),
-                    bagDbService.createBag(new BagEntity(update))
-            );
-        }
+        UserEntity user = new UserEntity();
+        BagDto bag = bagDbService.createBag(new BagEntity());
+        user.setBag(bagDbService.toEntity(bag));
+        userDbService.createUser(user);
     }
 }

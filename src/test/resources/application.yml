@@ -1,0 +1,27 @@
+server:
+  port: ${SERVER_PORT:8083}
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: test
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: test
+      port: test
+  output:
+    ansi:
+      enabled: ALWAYS

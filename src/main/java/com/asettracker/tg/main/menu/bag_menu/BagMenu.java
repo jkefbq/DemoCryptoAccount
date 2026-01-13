@@ -1,6 +1,6 @@
 package com.asettracker.tg.main.menu.bag_menu;
 
-import com.asettracker.tg.main.database.entity.BagEntity;
+import com.asettracker.tg.main.database.dto.BagDto;
 import com.asettracker.tg.main.database.service.BagDbService;
 import com.asettracker.tg.main.menu.IMenu;
 import com.asettracker.tg.main.service.ChatId;
@@ -48,7 +48,7 @@ public class BagMenu implements IMenu {
     @SneakyThrows
     @Override
     public void sendMenu(Update update) {
-        CompletableFuture<BagEntity> bag = getBagAsync(update);
+        CompletableFuture<BagDto> bag = getBagAsync(update);
         SendPhoto sendPhoto = SendPhoto.builder()
                 .chatId(ChatId.get(update))
                 .photo(MENU_PHOTO)
@@ -59,7 +59,7 @@ public class BagMenu implements IMenu {
         telegramClient.execute(sendPhoto);
     }
 
-    public CompletableFuture<BagEntity> getBagAsync(Update update) {
+    public CompletableFuture<BagDto> getBagAsync(Update update) {
         return CompletableFuture.supplyAsync(() ->
                 bagDbService.findBagByChatId(ChatId.get(update))
                         .orElseThrow()
