@@ -64,20 +64,20 @@ public class BagService {
         try {
             actualizeBagFields(bag);
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("exception for executing actualizeBagFields()");
+            throw new RuntimeException("exception for call coinGecko api method");
         }
     }
 
     @Transactional
     public void addAsset(UserCoin userCoin) {
-        log.info("call addAsset={name={}, count={}} with chatId={}", userCoin.getCoin().name(),
-                userCoin.getCount(), userCoin.getChatId());
+        log.info("add or update asset {name={}, count={}} into bag with chatId={}",
+                userCoin.getCoin().name(), userCoin.getCount(), userCoin.getChatId());
         BagDto bag = findByChatId(userCoin.getChatId()).orElseThrow();
         bag.getAssets().put(userCoin.getCoin(), userCoin.getCount());
         try {
             actualizeBagFields(bag);
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("exception for executing actualizeBagFields()");
+            throw new RuntimeException("exception for call coinGecko api method");
         }
     }
 
@@ -92,7 +92,8 @@ public class BagService {
         bag.setAssetCount(bag.getAssets().size());
 
         bagRepo.save(mapper.toEntity(bag));
-        log.info("update bag assets: {totalCost:{}, assetCount:{}}", bag.getTotalCost(), bag.getAssetCount());
+        log.info("update assets: {totalCost:{}, assetCount:{}} in bag with chatId={}", bag.getTotalCost(),
+                bag.getAssetCount(), bag.getChatId());
     }
 
     @Transactional

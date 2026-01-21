@@ -31,8 +31,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BagEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
     private Long chatId;

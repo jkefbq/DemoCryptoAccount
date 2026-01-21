@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.database.entity;
 
-import com.assettracker.main.telegram_bot.service.ChatId;
+import com.assettracker.main.telegram_bot.dto.UpdateDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -23,8 +22,8 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class UserEntity implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
     private Long chatId;
@@ -43,10 +42,10 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "bag_id")
     private BagEntity bag;
 
-    public UserEntity(Update update) {
-        this.firstName = ChatId.getUser(update).getFirstName();
-        this.lastName = ChatId.getUser(update).getLastName();
-        this.userName = ChatId.getUser(update).getUserName();
-        this.chatId = ChatId.get(update);
+    public UserEntity(UpdateDto updateDto) {
+        this.firstName = updateDto.getFirstName();
+        this.lastName = updateDto.getLastName();
+        this.userName = updateDto.getUserName();
+        this.chatId = updateDto.getChatId();
     }
 }

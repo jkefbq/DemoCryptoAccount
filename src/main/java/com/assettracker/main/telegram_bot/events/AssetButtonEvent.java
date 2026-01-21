@@ -2,9 +2,10 @@ package com.assettracker.main.telegram_bot.events;
 
 import com.assettracker.main.telegram_bot.buttons.menu.asset_list_menu.Coins;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
 
-
+@ToString
 public class AssetButtonEvent extends ApplicationEvent {
 
     @Getter

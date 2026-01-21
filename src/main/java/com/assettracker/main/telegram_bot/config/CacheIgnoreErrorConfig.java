@@ -1,4 +1,4 @@
-package com.assettracker.main.telegram_bot.service;
+package com.assettracker.main.telegram_bot.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;

@@ -24,15 +24,19 @@ import java.util.UUID;
 @Setter
 @Getter
 public class UserCoinEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
+
     @Enumerated(EnumType.STRING)
     private Coins coin;
+
     private BigDecimal count;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "asset_do")
     private AssetDo assetDo;
+
     @Column(name = "chat_id")
     private Long chatId;
 

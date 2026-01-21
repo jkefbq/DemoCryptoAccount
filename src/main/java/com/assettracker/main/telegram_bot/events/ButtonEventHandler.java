@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ButtonEventHandler {//todo логгирование через AOP
+public class ButtonEventHandler {
 
     private final BagMenu bagMenu;
     private final LastMessageService lastMessageService;
@@ -35,89 +35,71 @@ public class ButtonEventHandler {//todo логгирование через AOP
 
     @EventListener(condition = "event.getButton.name() == 'MY_BAG'")
     public void handleMyBag(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         bagMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'MANAGE_ASSETS'")
     public void handleManageAssets(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         manageAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'CREATE_ASSET'")
     public void handleCreateAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         assetListMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetService.saveTmpUserCoin(new UserCoin(event.getChatId(), AssetDo.CREATE));
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'UPDATE_ASSET'")
     public void handleUpdateAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         assetListMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetService.saveTmpUserCoin(new UserCoin(event.getChatId(), AssetDo.UPDATE));
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'FORCE_UPDATE_ASSET'")
     public void handleForceUpdateAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         UserCoin tmp = assetService.getTmpUserCoin(event.getChatId());
         tmp.setAssetDo(AssetDo.UPDATE);
         assetService.saveTmpUserCoin(tmp);
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         enterAssetCountMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'FORCE_CREATE_ASSET' || " +
             "event.getButton().name() == 'CREATE_ASSET_AFTER_TRY_DELETE'")
     public void handleForceCreateAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         UserCoin tmp = assetService.getTmpUserCoin(event.getChatId());
         tmp.setAssetDo(AssetDo.CREATE);
         assetService.saveTmpUserCoin(tmp);
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         enterAssetCountMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_MANAGE_ASSETS'")
     public void handleCancelForceUpdateAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         manageAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetService.deleteTmpUserCoin(event.getChatId());
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener(condition = "event.getButton().name() == 'DELETE_ASSET'")
     public void handleDeleteAsset(ButtonEvent event) {
-        log.info("about to handle '{}' button", event.getButton().name());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         assetListMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetService.saveTmpUserCoin(new UserCoin(event.getChatId(), AssetDo.DELETE));
-        log.info("button '{}' handled successfully", event.getButton().name());
     }
 
     @EventListener
     public void handleAnyAssetButton(AssetButtonEvent event) {
-        log.info("about to handle '{}' asset button", event.getCoin());
         var tmpCoin = assetService.getTmpUserCoin(event.getChatId());
         var lastMessageId = lastMessageService.getLastMessage(event.getChatId());
 
         tmpCoin.setCoin(event.getCoin());
         assetService.saveTmpUserCoin(tmpCoin);
         processAsset(event, tmpCoin, lastMessageId);
-        log.info("asset button '{}' handled successfully", event.getCoin());
     }
 
     private void processAsset(AssetButtonEvent event, UserCoin tmpCoin, Integer lastMessageId) {

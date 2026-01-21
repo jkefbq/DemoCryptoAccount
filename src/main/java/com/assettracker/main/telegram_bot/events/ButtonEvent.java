@@ -1,8 +1,10 @@
 package com.assettracker.main.telegram_bot.events;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
 
+@ToString
 public class ButtonEvent extends ApplicationEvent {
 
     @Getter
