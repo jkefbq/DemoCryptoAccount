@@ -1,7 +1,7 @@
 package com.assettracker.main.telegram_bot.menu.incorrect_delete_menu;
 
 import com.assettracker.main.telegram_bot.menu.IMenu;
-import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.CancelToManageAssets;
+import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.CancelToMyAssets;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,7 +19,7 @@ public class IncorrectDeleteMenu implements IMenu {
 
     private final TelegramClient telegramClient;
     private final CreateAssetAfterTryDeleteButton createButton;
-    private final CancelToManageAssets cancelButton;
+    private final CancelToMyAssets cancelButton;
     private final LastMessageService lastMessageService;
 
     @SneakyThrows
@@ -32,7 +32,6 @@ public class IncorrectDeleteMenu implements IMenu {
                 .replyMarkup(combineButtons(List.of(createButton, cancelButton)))
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @SneakyThrows
@@ -55,6 +54,5 @@ public class IncorrectDeleteMenu implements IMenu {
                 .text("Успех! Монета удалена из вашего портфеля")
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 }

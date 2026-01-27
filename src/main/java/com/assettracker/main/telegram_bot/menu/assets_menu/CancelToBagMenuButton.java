@@ -1,16 +1,17 @@
-package com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu;
+package com.assettracker.main.telegram_bot.menu.my_assets_menu;
 
-import com.assettracker.main.telegram_bot.events.Buttons;
+import com.assettracker.main.telegram_bot.menu.Buttons;
+import com.assettracker.main.telegram_bot.menu.assets_menu.IAssetsMenuButton;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Component
-public class CancelToManageAssets implements IIncorrectUpdateAssetMenuButton {
+public class CancelToBagMenuButton implements IAssetsMenuButton {
 
     @Getter
-    private final String callbackData =
-            Buttons.CANCEL_TO_MANAGE_ASSETS.getCallbackData();
+    private final String callbackData = Buttons.CANCEL_TO_BAG_MENU.getCallbackData();
+
 
     @Override
     public InlineKeyboardButton getButton() {
@@ -19,5 +20,4 @@ public class CancelToManageAssets implements IIncorrectUpdateAssetMenuButton {
                 .callbackData(callbackData)
                 .build();
     }
-
 }

@@ -1,6 +1,5 @@
 package com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu;
 
-import com.assettracker.main.telegram_bot.menu.IButton;
 import com.assettracker.main.telegram_bot.menu.IMenu;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
@@ -19,11 +18,10 @@ import java.util.List;
 @AllArgsConstructor
 public class IncorrectUpdateAssetMenu implements IMenu {
 
-    private List<IIncorrectUpdateAssetMenuButton> buttons;
     private TelegramClient telegramClient;
     private LastMessageService lastMessageService;
     private ForceCreateAssetButton createButton;
-    private CancelToManageAssets cancelButton;
+    private CancelToMyAssets cancelButton;
 
     @Override
     @SneakyThrows
@@ -32,10 +30,9 @@ public class IncorrectUpdateAssetMenu implements IMenu {
                 .chatId(chatId)
                 .messageId(messageId)
                 .text("У вас нет этой монеты, хотите ее добавить?")
-                .replyMarkup(combineButtons(buttons))
+                .replyMarkup(getMarkup())
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @Override
@@ -44,14 +41,13 @@ public class IncorrectUpdateAssetMenu implements IMenu {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
                 .text("У вас нет этой монеты, хотите ее добавить?")
-                .replyMarkup(combineButtons(buttons))
+                .replyMarkup(getMarkup())
                 .build();
         Message msg = telegramClient.execute(sendMessage);
         lastMessageService.setLastMessage(chatId, msg.getMessageId());
     }
 
-    @Override
-    public InlineKeyboardMarkup combineButtons(List<? extends IButton> buttons) {
+    public InlineKeyboardMarkup getMarkup() {
         return new InlineKeyboardMarkup(
                 List.of(
                         new InlineKeyboardRow(createButton.getButton()),

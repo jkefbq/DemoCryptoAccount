@@ -5,14 +5,16 @@ import com.assettracker.main.telegram_bot.menu.asset_list_menu.Coins;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.IAsset;
 import com.assettracker.main.telegram_bot.events.AssetButtonEvent;
 import com.assettracker.main.telegram_bot.events.ButtonEvent;
-import com.assettracker.main.telegram_bot.events.Buttons;
+import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ButtonHandler {
@@ -28,12 +30,13 @@ public class ButtonHandler {
             if (button.getCallbackData().equals(callbackQuery.getData())) {
                 if (button instanceof IAsset) {
                     Coins thisCoin = ((IAsset) button).getCoin();
+                    log.info("about to publishing event with Coins={} and chatId={}", thisCoin, chatId);
                     eventPublisher.publishEvent(new AssetButtonEvent(this, thisCoin, chatId));
                 } else {
                     Buttons thisButton = Buttons.parseCallbackData(callbackQuery.getData());
+                    log.info("about to publishing event with Buttons={} and chatId={}", thisButton, chatId);
                     eventPublisher.publishEvent(new ButtonEvent(this, thisButton, chatId));
                 }
-
             }
         });
     }

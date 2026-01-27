@@ -1,6 +1,9 @@
-package com.assettracker.main.telegram_bot.menu.main_menu;
+package com.assettracker.main.telegram_bot.menu.ai_advice_menu;
 
+import com.assettracker.main.telegram_bot.database.service.BagService;
 import com.assettracker.main.telegram_bot.menu.IMenu;
+import com.assettracker.main.telegram_bot.menu.my_assets_menu.CancelToBagMenuButton;
+import com.assettracker.main.telegram_bot.service.AIService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,52 +18,43 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class MainMenu implements IMenu {
+public class AIAdviceMenu implements IMenu {
 
-    private final TelegramClient telegramClient;
-    private final List<IMainMenuButton> buttons;
     private final LastMessageService lastMessageService;
+    private final TelegramClient telegramClient;
+    private final AIService aiService;
+    private final BagService bagService;
+    private final CancelToBagMenuButton cancelButton;
 
     @SneakyThrows
     @Override
     public void editMsgAndSendMenu(Long chatId, Integer messageId) {
+        var assets = bagService.findByChatId(chatId).orElseThrow().getAssets();
+        String advice = aiService.getAdvice(assets);
         EditMessageText editMessageText = EditMessageText.builder()
-                .chatId(chatId)
+                .text(getMenuText(advice))
                 .messageId(messageId)
-                .text(getText())
-                .replyMarkup(combineButtons(buttons))
+                .replyMarkup(combineButtons(List.of(cancelButton)))
                 .parseMode(ParseMode.HTML)
                 .build();
         telegramClient.execute(editMessageText);
     }
 
+    private String getMenuText(String aiAnswer) {
+        return "" + aiAnswer;
+    }
+
     @SneakyThrows
     @Override
     public void sendMenu(Long chatId) {
+        var assets = bagService.findByChatId(chatId).orElseThrow().getAssets();
+        String advice = aiService.getAdvice(assets);
         SendMessage sendMessage = SendMessage.builder()
-                .chatId(chatId)
-                .text(getText())
-                .replyMarkup(combineButtons(buttons))
+                .text(getMenuText(advice))
+                .replyMarkup(combineButtons(List.of(cancelButton)))
                 .parseMode(ParseMode.HTML)
                 .build();
         Message msg = telegramClient.execute(sendMessage);
         lastMessageService.setLastMessage(chatId, msg.getMessageId());
-    }
-
-    private String getText() {
-        return """
-                <code>          ГЛАВНОЕ МЕНЮ            \s
-                --------------------------------- \s
-                                    (_)           \s
-                 _ .--..--.  ,--.   __   _ .--.   \s
-                [ `.-. .-. |`'_\\ : [  | [ `.-. |  \s
-                 | | | | | |// | |, | |  | | | |  \s
-                [___||_||__]\\'-;__/[___][__| |__] \s
-                </code>
-                <blockquote>
-                Твои активы под присмотром,
-                что делаем?
-                </blockquote>
-                """;
     }
 }

@@ -27,7 +27,6 @@ public class EnterAssetCountMenu implements IMenu {
                 .text("Введите количество монет:")
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @Override

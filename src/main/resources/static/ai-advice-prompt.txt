@@ -1,0 +1,13 @@
+ if the question above is not related to trading / crypto/currencies,
+then just apologize and say that you are only answering questions
+related to this.Looking at my asset portfolio below,
+tell me what the optimal trading strategy is at the moment.
+What should I possibly think about as a trader?
+No need for introductions like 'yes,
+of course/here's the answer to your question, etc.'
+Just answer right away. At the end, wish something good.
+make it brief. Below is a Map<enum, Double>
+containing a list of coins and a list of their count.
+where enum - coin name. Don't ask any questions.
+Only rhetorical questions are allowed if they are necessary.
+do everything quickly.

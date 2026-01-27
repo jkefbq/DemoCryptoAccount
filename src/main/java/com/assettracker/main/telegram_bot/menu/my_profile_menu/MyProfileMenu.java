@@ -9,6 +9,7 @@ import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -38,9 +39,9 @@ public class MyProfileMenu implements IMenu {
                         user.getFirstName(), user.getLastName(),
                         user.getUserName(), bag.getCreatedAt()))
                 .replyMarkup(combineButtons(buttons))
+                .parseMode(ParseMode.HTML)
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @SneakyThrows
@@ -54,6 +55,7 @@ public class MyProfileMenu implements IMenu {
                         user.getFirstName(), user.getLastName(),
                         user.getUserName(), bag.getCreatedAt()))
                 .replyMarkup(combineButtons(buttons))
+                .parseMode(ParseMode.HTML)
                 .build();
         Message msg = telegramClient.execute(sendMessage);
         lastMessageService.setLastMessage(chatId, msg.getMessageId());
@@ -61,12 +63,14 @@ public class MyProfileMenu implements IMenu {
 
     public static String getMenuText() {
         return """
-                👤Ваш Профиль:
-                ├ Имя: %s
-                ├ Фамилия: %s
-                ├ Юзернейм: @%s
-                
-                🕔Торгуете с:
-                └ %s""";
+                <pre><code class="language-java">
+                log.error(
+                    "⚠too cool user with data:",
+                    User.firstName="%s",
+                    User.lastName="%s",
+                    User.username="@%s",
+                    User.createdAt="%s"
+                );
+                </code></pre>""";
     }
 }

@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.menu.main_menu;
 
-import com.assettracker.main.telegram_bot.events.Buttons;
+import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class ViewBagButton implements IMainMenuButton {
     @Override
     public InlineKeyboardButton getButton() {
         return InlineKeyboardButton.builder()
-                .text("Мой портфель")
+                .text("🎒 Мой портфель")
                 .callbackData(callbackData)
                 .build();
     }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -95,6 +96,16 @@ public class BagService {
         updateBag(mapper.toEntity(bag));
         log.info("update assets: {totalCost:{}, assetCount:{}} in bag with chatId={}", bag.getTotalCost(),
                 bag.getAssetCount(), bag.getChatId());
+    }
+
+    @SneakyThrows
+    @Transactional
+    public Map<Coins, Map.Entry<BigDecimal, BigDecimal>> getCoinCountAndPrices(Map<Coins, BigDecimal> coinCount) {
+        Map<Coins, Map.Entry<BigDecimal, BigDecimal>> result = new HashMap<>();
+        marketInfoKeeper.getCoinPrices(coinCount.keySet()).forEach((coin, price) -> {
+            result.put(coin, Map.entry(coinCount.get(coin), price));
+        });
+        return result;
     }
 
     @SneakyThrows

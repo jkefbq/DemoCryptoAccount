@@ -1,6 +1,5 @@
-package com.assettracker.main.telegram_bot.menu.my_assets_menu;
+package com.assettracker.main.telegram_bot.menu.asset_list_menu;
 
-import com.assettracker.main.telegram_bot.events.Buttons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -8,17 +7,21 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 @Component
 @AllArgsConstructor
-public class ManageAssetsButton implements IMyAssetsMenuButton {
+public class USDTButton implements IAssetListMenuButton, IAsset {
 
     @Getter
-    private final String callbackData = Buttons.MANAGE_ASSETS.getCallbackData();
+    private final String callbackData = Coins.USDT.getIdsName();
 
     @Override
     public InlineKeyboardButton getButton() {
         return InlineKeyboardButton.builder()
-                .text("Управлять активами")
+                .text("USDT")
                 .callbackData(callbackData)
                 .build();
     }
 
+    @Override
+    public Coins getCoin() {
+        return Coins.USDT;
+    }
 }

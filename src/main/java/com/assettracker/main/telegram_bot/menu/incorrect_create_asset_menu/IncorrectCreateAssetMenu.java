@@ -1,8 +1,7 @@
 package com.assettracker.main.telegram_bot.menu.incorrect_create_asset_menu;
 
-import com.assettracker.main.telegram_bot.menu.IButton;
 import com.assettracker.main.telegram_bot.menu.IMenu;
-import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.CancelToManageAssets;
+import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.CancelToMyAssets;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,10 +20,9 @@ import java.util.List;
 public class IncorrectCreateAssetMenu implements IMenu {
 
     private final TelegramClient telegramClient;
-    private final List<IIncorrectCreateAssetMenuButton> buttons;
     private final LastMessageService lastMessageService;
     private final ForceUpdateAssetButton updateButton;
-    private final CancelToManageAssets cancelButton;
+    private final CancelToMyAssets cancelButton;
 
     @SneakyThrows
     @Override
@@ -33,10 +31,9 @@ public class IncorrectCreateAssetMenu implements IMenu {
                 .chatId(chatId)
                 .messageId(messageId)
                 .text("У вас уже есть данная монета, хотите обновить ее?")
-                .replyMarkup(combineButtons(buttons))
+                .replyMarkup(getMarkup())
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @SneakyThrows
@@ -45,14 +42,13 @@ public class IncorrectCreateAssetMenu implements IMenu {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
                 .text("У вас уже есть данная монета, хотите обновить ее?")
-                .replyMarkup(combineButtons(buttons))
+                .replyMarkup(getMarkup())
                 .build();
         Message msg = telegramClient.execute(sendMessage);
         lastMessageService.setLastMessage(chatId, msg.getMessageId());
     }
 
-    @Override
-    public InlineKeyboardMarkup combineButtons(List<? extends IButton> buttons) {
+    public InlineKeyboardMarkup getMarkup() {
         return new InlineKeyboardMarkup(
                 List.of(
                         new InlineKeyboardRow(updateButton.getButton()),

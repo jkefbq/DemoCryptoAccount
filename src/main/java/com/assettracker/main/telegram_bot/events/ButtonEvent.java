@@ -1,5 +1,6 @@
 package com.assettracker.main.telegram_bot.events;
 
+import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.context.ApplicationEvent;

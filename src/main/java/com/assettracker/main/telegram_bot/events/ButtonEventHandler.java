@@ -2,19 +2,21 @@ package com.assettracker.main.telegram_bot.events;
 
 import com.assettracker.main.telegram_bot.database.dto.BagDto;
 import com.assettracker.main.telegram_bot.database.service.BagService;
+import com.assettracker.main.telegram_bot.menu.ai_advice_menu.AIAdviceMenu;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.AssetDo;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.AssetListMenu;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.UserCoin;
 import com.assettracker.main.telegram_bot.menu.asset_statistics_menu.AssetStatisticsMenu;
+import com.assettracker.main.telegram_bot.menu.assets_menu.AssetsMenu;
 import com.assettracker.main.telegram_bot.menu.bag_menu.BagMenu;
 import com.assettracker.main.telegram_bot.menu.enter_asset_count_menu.EnterAssetCountMenu;
 import com.assettracker.main.telegram_bot.menu.incorrect_create_asset_menu.IncorrectCreateAssetMenu;
 import com.assettracker.main.telegram_bot.menu.incorrect_delete_menu.IncorrectDeleteMenu;
 import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.IncorrectUpdateAssetMenu;
 import com.assettracker.main.telegram_bot.menu.main_menu.MainMenu;
-import com.assettracker.main.telegram_bot.menu.manage_assets_menu.ManageAssetsMenu;
 import com.assettracker.main.telegram_bot.menu.my_assets_menu.MyAssetsMenu;
 import com.assettracker.main.telegram_bot.menu.my_profile_menu.MyProfileMenu;
+import com.assettracker.main.telegram_bot.menu.trade_with_ai_menu.TradeWithAIMenu;
 import com.assettracker.main.telegram_bot.menu.waiting_menu.WaitingMenu;
 import com.assettracker.main.telegram_bot.service.AssetService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
@@ -31,7 +33,7 @@ public class ButtonEventHandler {
 
     private final BagMenu bagMenu;
     private final LastMessageService lastMessageService;
-    private final ManageAssetsMenu manageAssetsMenu;
+    private final MyAssetsMenu myAssetsMenu;
     private final BagService bagService;
     private final AssetService assetService;
     private final IncorrectUpdateAssetMenu incorrectUpdateAssetMenu;
@@ -42,20 +44,15 @@ public class ButtonEventHandler {
     private final MyProfileMenu profileMenu;
     private final MainMenu mainMenu;
     private final WaitingMenu waitingMenu;
-    private final MyAssetsMenu myAssetsMenu;
+    private final AssetsMenu assetsMenu;
     private final AssetStatisticsMenu assetStatisticsMenu;
+    private final TradeWithAIMenu tradeWithAIMenu;
+    private final AIAdviceMenu aiAdviceMenu;
 
     @EventListener(condition = "event.getButton.name() == 'MY_BAG'")
     public void handleMyBag(ButtonEvent event) {
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         bagMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
-    }
-
-    @EventListener(condition = "event.getButton().name() == 'MANAGE_ASSETS'")
-    public void handleManageAssets(ButtonEvent event) {
-        Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        manageAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
     @EventListener(condition = "event.getButton().name() == 'CREATE_ASSET'")
@@ -91,10 +88,10 @@ public class ButtonEventHandler {
         enterAssetCountMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
-    @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_MANAGE_ASSETS'")
+    @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_MY_ASSETS'")
     public void handleCancelForceUpdateAsset(ButtonEvent event) {
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        manageAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+        myAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetService.deleteTmpUserCoin(event.getChatId());
     }
 
@@ -113,15 +110,15 @@ public class ButtonEventHandler {
 
     @EventListener(condition = "event.getButton().name() == 'MY_PROFILE'")
     public void handleProfile(ButtonEvent event) {
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         profileMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
     @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_BAG_MENU'")
     public void handleCancelToBagMenu(ButtonEvent event) {
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         bagMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
@@ -131,33 +128,53 @@ public class ButtonEventHandler {
         BagDto bag = bagService.findByChatId(event.getChatId()).orElseThrow();
         bagService.actualizeBagFields(bag);
 
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         bagMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
-    @EventListener(condition = "event.getButton().name() == 'MY_ASSETS' || " +
-            "event.getButton().name() == 'CANCEL_TO_MY_ASSETS'")
+    @EventListener(condition = "event.getButton().name() == 'ASSETS' || " +
+            "event.getButton().name() == 'CANCEL_TO_ASSETS'")
+    public void handleAssets(ButtonEvent event) {
+        Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
+        assetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+    }
+
+    @EventListener(condition = "event.getButton().name() == 'MY_ASSETS'")
     public void handleMyAssets(ButtonEvent event) {
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         myAssetsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
     @EventListener(condition = "event.getButton().name() == 'ASSET_STATISTICS'")
     public void handleAssetStatistics(ButtonEvent event) {
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
         assetStatisticsMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+    }
+
+    @EventListener(condition = "event.getButton().name() == 'TRADE_WITH_AI'")
+    public void handleTradeWithAI(ButtonEvent event) {
+        Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
+        tradeWithAIMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+    }
+
+    @EventListener(condition = "event.getButton().name() == 'AI_ADVICE'")
+    public void handleAIAdvice(ButtonEvent event) {
+        waitingMenu.sendMenu(event.getChatId());
+        Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
+        aiAdviceMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
 
     @EventListener
     public void handleAnyAssetButton(AssetButtonEvent event) {
         var tmpCoin = assetService.getTmpUserCoin(event.getChatId());
-        var lastMessageId = lastMessageService.getLastMessage(event.getChatId());
 
         tmpCoin.setCoin(event.getCoin());
+        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         assetService.saveTmpUserCoin(tmpCoin);
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+        var lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         processAsset(event, tmpCoin, lastMessageId);
     }
 

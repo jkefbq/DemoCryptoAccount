@@ -1,7 +1,7 @@
-package com.assettracker.main.telegram_bot.menu.asset_list_menu;
+package com.assettracker.main.telegram_bot.menu.assets_menu;
 
 import com.assettracker.main.telegram_bot.menu.IMenu;
-import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.CancelToMyAssets;
+import com.assettracker.main.telegram_bot.menu.my_assets_menu.CancelToBagMenuButton;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,24 +18,16 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class AssetListMenu implements IMenu {
+public class AssetsMenu implements IMenu {
 
     private final TelegramClient telegramClient;
     private final LastMessageService lastMessageService;
-    private final BitcoinButton bitcoinButton;
-    private final BNBButton bnbButton;
-    private final DogecoinButton dogecoinButton;
-    private final EthereumButton ethereumButton;
-    private final LiteCoinButton liteCoinButton;
-    private final PepeButton pepeButton;
-    private final SolanaButton solanaButton;
-    private final USDTButton usdtButton;
-    private final TronButton tronButton;
-    private final XRPButton xrpButton;
-    private final CancelToMyAssets cancelButton;
+    private final MyAssetsButton myAssetsButton;
+    private final AssetStatisticsButton statisticsButton;
+    private final CancelToBagMenuButton cancelButton;
 
-    @Override
     @SneakyThrows
+    @Override
     public void editMsgAndSendMenu(Long chatId, Integer messageId) {
         EditMessageText editMessageText = EditMessageText.builder()
                 .chatId(chatId)
@@ -47,8 +39,8 @@ public class AssetListMenu implements IMenu {
         telegramClient.execute(editMessageText);
     }
 
-    @Override
     @SneakyThrows
+    @Override
     public void sendMenu(Long chatId) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
@@ -63,24 +55,32 @@ public class AssetListMenu implements IMenu {
     public InlineKeyboardMarkup getMarkup() {
         return new InlineKeyboardMarkup(
                 List.of(
-                        new InlineKeyboardRow(bitcoinButton.getButton(), ethereumButton.getButton()),
-                        new InlineKeyboardRow(bnbButton.getButton(), solanaButton.getButton()),
-                        new InlineKeyboardRow(liteCoinButton.getButton(), usdtButton.getButton()),
-                        new InlineKeyboardRow(dogecoinButton.getButton(), pepeButton.getButton()),
-                        new InlineKeyboardRow(tronButton.getButton(), xrpButton.getButton()),
+                        new InlineKeyboardRow(myAssetsButton.getButton()),
+                        new InlineKeyboardRow(statisticsButton.getButton()),
                         new InlineKeyboardRow(cancelButton.getButton())
                 )
         );
     }
 
-    private String getMenuText() {
+    public String getMenuText() {
         return """
-                <pre><code class="language-java">
-                new Thread(() -> {
-                    System.out.println(
-                        "Выбери любую монету"
-                    );
-                }).start();
-                </code></pre>""";
+                <code>              АКТИВЫ             \s
+                ---------------------------------\s
+                 .oooo.    .oooo.o  .oooo.o      \s
+                `P  )88b  d88(  "8 d88(  "8      \s
+                 .oP"888  `"Y88b.  `"Y88b.       \s
+                d8(  888  o.  )88b o.  )88b      \s
+                `Y888""8o 8""888P' 8""888P'      \s
+                                 .o8             \s
+                      .ooooo.  .o888oo   .oooo.o \s
+                     d88' `88b   888    d88(  "8 \s
+                     888ooo888   888    `"Y88b.  \s
+                     888    .o   888 .  o.  )88b \s
+                     `Y8bod8P'   "888"  8""888P' \s
+                </code><blockquote>
+                Твоя панель управления активами,
+                какая стратегия торговли сегодня?
+                </blockquote>
+                """;
     }
 }

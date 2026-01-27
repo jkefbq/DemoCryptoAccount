@@ -20,7 +20,6 @@ public class MessageEventHandlerInterceptor {
     @Before("execution(* com.assettracker.main.telegram_bot.events.MessageEventHandler.*(..)) && " +
             "!execution(* com.assettracker.main.telegram_bot.events.MessageEventHandler.handleUnknown(..))")
     public void checkIsWaitingNumber(JoinPoint joinPoint) {
-        log.info("check is program waiting number for user");
         Object[] args = joinPoint.getArgs();
         Long chatId = null;
         for (Object arg : args) {
@@ -33,6 +32,5 @@ public class MessageEventHandlerInterceptor {
                     " method args=" + args + " [lost ButtonEvent or AssetButtonEvent type]");
         }
         assetService.deleteTmpUserCoin(chatId);
-        log.info("tmp userCoin was successfully delete if exists");
     }
 }

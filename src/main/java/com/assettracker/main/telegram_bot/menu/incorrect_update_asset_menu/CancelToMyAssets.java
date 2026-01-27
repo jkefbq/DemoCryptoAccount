@@ -1,23 +1,23 @@
-package com.assettracker.main.telegram_bot.menu.main_menu;
+package com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu;
 
 import com.assettracker.main.telegram_bot.menu.Buttons;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Component
-@AllArgsConstructor
-public class ViewProfileButton implements IMainMenuButton {
+public class CancelToMyAssets implements IIncorrectUpdateAssetMenuButton {
 
     @Getter
-    private final String callbackData = Buttons.MY_PROFILE.getCallbackData();
+    private final String callbackData =
+            Buttons.CANCEL_TO_MY_ASSETS.getCallbackData();
 
     @Override
     public InlineKeyboardButton getButton() {
         return InlineKeyboardButton.builder()
-                .text("👤 Мой профиль")
+                .text("Назад")
                 .callbackData(callbackData)
                 .build();
     }
+
 }

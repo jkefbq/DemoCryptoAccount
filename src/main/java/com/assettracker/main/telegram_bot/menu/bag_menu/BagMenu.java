@@ -1,14 +1,13 @@
 package com.assettracker.main.telegram_bot.menu.bag_menu;
 
-import com.assettracker.main.telegram_bot.menu.IButton;
+import com.assettracker.main.telegram_bot.database.service.BagService;
 import com.assettracker.main.telegram_bot.menu.IMenu;
 import com.assettracker.main.telegram_bot.menu.my_profile_menu.CancelToMainMenuButton;
-import com.assettracker.main.telegram_bot.database.dto.BagDto;
-import com.assettracker.main.telegram_bot.database.service.BagService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -16,7 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
@@ -24,58 +24,59 @@ import java.util.List;
 public class BagMenu implements IMenu {
 
     private final TelegramClient telegramClient;
-    private final List<IBagMenuButton> buttons;
-    private final MyAssetsButton myAssetsButton;
+    private final AssetsButton assetsButton;
     private final CancelToMainMenuButton cancelButton;
-    private final UpdateBagDataButton updateButton;
+    private final TradeWithAIButton tradeWithAIButton;
     private final BagService bagService;
     private final LastMessageService lastMessageService;
 
     public static String getMenuText() {
         return """
-                \uD83C\uDF92Информация о портфеле:
-                ├ Создан: %s
-                ├ Количество активов: %s
-                
-                \uD83D\uDCB0Суммарная стоимость:
-                └ %s$""";
+                <code>           МОЙ ПОРТФЕЛЬ         \s
+                ---------------------------------\s
+                :::::::.    :::.      .,-:::::/ \s
+                 ;;;'';;'   ;;`;;   ,;;-'````'  \s
+                 [[[__[[\\. ,[[ '[[, [[[   [[[[[[/
+                 $$""\""Y$$c$$$cc$$$c"$$c.    "$$\s
+                _88o,,od8P 888   888,`Y8bo,,,o88o
+                ""YUMMMP"  YMM   ""`   `'YMUP"YMM
+                </code><blockquote>
+                Ты в своем портфеле, что делаем?
+                </blockquote>""";
     }
 
     @SneakyThrows
     @Override
     public void editMsgAndSendMenu(Long chatId, Integer messageId) {
-        BagDto bag = bagService.findByChatId(chatId).orElseThrow();
         EditMessageText editMessageText = EditMessageText.builder()
                 .chatId(chatId)
                 .messageId(messageId)
-                .text(String.format(getMenuText(), bag.getCreatedAt(),
-                        bag.getAssetCount(), bag.getTotalCost().setScale(5, RoundingMode.HALF_UP)))
-                .replyMarkup(combineButtons(buttons))
+                .text(getMenuText())
+                .replyMarkup(getMarkup())
+                .parseMode(ParseMode.HTML)
                 .build();
         telegramClient.execute(editMessageText);
-        lastMessageService.setLastMessage(chatId, editMessageText.getMessageId());
     }
 
     @SneakyThrows
     @Override
     public void sendMenu(Long chatId) {
-        BagDto bag = bagService.findByChatId(chatId).orElseThrow();
+        LocalDate createdAt = bagService.findByChatId(chatId).orElseThrow().getCreatedAt();
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
-                .text(String.format(getMenuText(), bag.getCreatedAt(),
-                        bag.getAssetCount(), bag.getTotalCost().setScale(5, RoundingMode.HALF_UP)))
-                .replyMarkup(combineButtons(buttons))
+                .text(String.format(getMenuText(), ChronoUnit.DAYS.between(createdAt, LocalDate.now())))
+                .replyMarkup(getMarkup())
+                .parseMode(ParseMode.HTML)
                 .build();
         Message msg = telegramClient.execute(sendMessage);
         lastMessageService.setLastMessage(chatId, msg.getMessageId());
     }
 
-    @Override
-    public InlineKeyboardMarkup combineButtons(List<? extends IButton> buttons) {
+    public InlineKeyboardMarkup getMarkup() {
         return new InlineKeyboardMarkup(
                 List.of(
-                        new InlineKeyboardRow(myAssetsButton.getButton()),
-                        new InlineKeyboardRow(updateButton.getButton()),
+                        new InlineKeyboardRow(assetsButton.getButton()),
+                        new InlineKeyboardRow(tradeWithAIButton.getButton()),
                         new InlineKeyboardRow(cancelButton.getButton())
                 )
         );
