@@ -40,9 +40,7 @@ public class BagMenu implements IMenu {
                  $$""\""Y$$c$$$cc$$$c"$$c.    "$$\s
                 _88o,,od8P 888   888,`Y8bo,,,o88o
                 ""YUMMMP"  YMM   ""`   `'YMUP"YMM
-                </code><blockquote>
-                Ты в своем портфеле, что делаем?
-                </blockquote>""";
+                </code><blockquote>Ты в своем портфеле, что делаем?</blockquote>""";
     }
 
     @SneakyThrows

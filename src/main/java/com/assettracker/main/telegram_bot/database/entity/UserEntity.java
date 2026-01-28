@@ -3,6 +3,8 @@ package com.assettracker.main.telegram_bot.database.entity;
 import com.assettracker.main.telegram_bot.dto.UpdateDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor
+@Setter
 public class UserEntity implements Serializable {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,12 +40,15 @@ public class UserEntity implements Serializable {
     @Column(name = "username", length = 45)
     private String userName;
 
-    @Setter
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bag_id")
     private BagEntity bag;
 
     public UserEntity(UpdateDto updateDto) {
+        this.status = UserStatus.FREE;
         this.firstName = updateDto.getFirstName();
         this.lastName = updateDto.getLastName();
         this.userName = updateDto.getUserName();

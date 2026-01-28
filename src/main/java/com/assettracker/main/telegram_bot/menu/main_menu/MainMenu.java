@@ -57,8 +57,7 @@ public class MainMenu implements IMenu {
                  | | | | | |// | |, | |  | | | |  \s
                 [___||_||__]\\'-;__/[___][__| |__] \s
                 </code>
-                <blockquote>
-                Твои активы под присмотром,
+                <blockquote>Твои активы под присмотром,
                 что делаем?
                 </blockquote>
                 """;

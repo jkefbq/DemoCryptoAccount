@@ -23,7 +23,6 @@ public class TradeWithAIMenu implements IMenu {
     private final TelegramClient telegramClient;
     private final LastMessageService lastMessageService;
     private final AIAdviceButton adviceButton;
-    private final AIQuestionButton questionButton;
     private final CancelToBagMenuButton cancelButton;
 
     @SneakyThrows
@@ -48,8 +47,7 @@ public class TradeWithAIMenu implements IMenu {
                 === === ===  =====   ======== ===
                 ===     ===   ===    ===  === ===
                 ===     ===   ===    ===  === ===
-                </code><blockquote>
-                AI ассистент поможет вам в вопросах
+                </code><blockquote>AI ассистент поможет вам в вопросах
                 связанных с торговлей опираясь на
                 ваши активы и ситуацию на рынке.
                 </blockquote>
@@ -73,7 +71,6 @@ public class TradeWithAIMenu implements IMenu {
         return new InlineKeyboardMarkup(
                 List.of(
                         new InlineKeyboardRow(adviceButton.getButton()),
-                        new InlineKeyboardRow(questionButton.getButton()),
                         new InlineKeyboardRow(cancelButton.getButton())
                 )
         );

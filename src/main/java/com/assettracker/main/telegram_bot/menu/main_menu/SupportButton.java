@@ -1,4 +1,4 @@
-package com.assettracker.main.telegram_bot.menu.trade_with_ai_menu;
+package com.assettracker.main.telegram_bot.menu.main_menu;
 
 import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.Getter;
@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Component
-public class AIQuestionButton implements ITradeWithAiMenuButton {
+public class SupportButton implements IMainMenuButton {
 
     @Getter
-    private final String callbackData = Buttons.AI_QUESTION.getCallbackData();
+    private final String callbackData = Buttons.SUPPORT.getCallbackData();
 
     @Override
     public InlineKeyboardButton getButton() {
         return InlineKeyboardButton.builder()
-                .text("💭 Спросить AI")
+                .text("🦺 Поддержка")
                 .callbackData(callbackData)
                 .build();
     }

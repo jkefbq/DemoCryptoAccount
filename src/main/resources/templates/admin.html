@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Панель администратора - Поддержка</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 32px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 4px;
+            letter-spacing: -1px;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .messages-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+
+        .toolbar {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 48px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+            transition: color 0.2s;
+        }
+
+        .clear-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .clear-btn.visible {
+            display: block;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .messages-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .messages-list::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .messages-list::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
+        }
+
+        .message-card {
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+            transform: translateX(4px);
+        }
+
+        .message-card.active {
+            border-color: var(--primary);
+            background: var(--bg-primary);
+        }
+
+        .message-card.replied {
+            opacity: 0.6;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+        }
+
+        .user-id {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .message-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.new {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-badge.replied {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .message-time {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .message-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            word-wrap: break-word;
+        }
+
+        .detail-panel {
+            width: 500px;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            padding: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-header h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .detail-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .detail-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .detail-content::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        .detail-content::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .question-detail {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-row {
+            margin-bottom: 20px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.7;
+            word-wrap: break-word;
+        }
+
+        .detail-value strong {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        .reply-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .quick-replies {
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .quick-reply-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .quick-reply-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .reply-textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s;
+            line-height: 1.6;
+        }
+
+        .reply-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+        }
+
+        .reply-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .reply-textarea:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .reply-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-primary);
+            border-color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--bg-tertiary);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            padding: 20px 28px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px var(--shadow);
+            display: none;
+            align-items: center;
+            gap: 16px;
+            animation: slideInUp 0.3s ease-out;
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--danger);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .detail-panel {
+                width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .messages-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .detail-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>
+            <div class="logo">💬</div>
+            Панель поддержки
+        </h1>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Всего</div>
+                <div class="stat-value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Новых</div>
+                <div class="stat-value" id="newCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Отвечено</div>
+                <div class="stat-value" id="repliedCount">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="messages-panel">
+            <div class="toolbar">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input
+                            type="text"
+                            class="search-input"
+                            id="searchInput"
+                            placeholder="Поиск по User ID или тексту вопроса..."
+                    >
+                    <button class="clear-btn" id="clearBtn">×</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Все вопросы</button>
+                    <button class="filter-btn" data-filter="new">Новые</button>
+                    <button class="filter-btn" data-filter="replied">Обработанные</button>
+                </div>
+            </div>
+
+            <div class="messages-list" id="messagesList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Загрузка вопросов...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-panel">
+            <div class="detail-header">
+                <h2>Детали вопроса</h2>
+                <p class="detail-subtext">Выберите вопрос для просмотра и ответа</p>
+            </div>
+            <div class="detail-content" id="detailContent">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p class="empty-text">Выберите вопрос из списка</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon"></span>
+    <span class="toast-message" id="toastMessage"></span>
+</div>
+
+<script>
+    // Application state
+    let allQuestions = [];
+    let filteredQuestions = [];
+    let selectedQuestion = null;
+    let currentFilter = 'all';
+    let csrfToken = '';
+    let csrfHeader = '';
+
+    // Quick reply templates
+    const quickReplies = [
+        "Спасибо за ваш вопрос! Мы рассмотрим его в ближайшее время.",
+        "Ваш запрос принят в обработку.",
+        "Пожалуйста, предоставьте дополнительные детали.",
+        "Проблема решена. Спасибо за обращение!",
+        "Мы уточним информацию и свяжемся с вами."
+    ];
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get CSRF token from meta tags
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+
+        if (tokenMeta) csrfToken = tokenMeta.getAttribute('content');
+        if (headerMeta) csrfHeader = headerMeta.getAttribute('content');
+
+        loadQuestions();
+        setupEventListeners();
+    });
+
+    // Setup event listeners
+    function setupEventListeners() {
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+
+        searchInput.addEventListener('input', handleSearch);
+        clearBtn.addEventListener('click', clearSearch);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                applyFilters();
+            });
+        });
+    }
+
+    // Load questions from backend
+    async function loadQuestions() {
+        try {
+            const response = await fetch('/admin/questions');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            allQuestions = await response.json();
+            applyFilters();
+            updateStats();
+
+        } catch (error) {
+            console.error('Error loading questions:', error);
+            showToast('Ошибка загрузки вопросов', 'error');
+            document.getElementById('messagesList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <p class="empty-text">Ошибка загрузки данных</p>
+                </div>
+            `;
+        }
+    }
+
+    // Apply filters and search
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+        filteredQuestions = allQuestions.filter(q => {
+            // Filter by status
+            const matchesFilter =
+                currentFilter === 'all' ||
+                (currentFilter === 'new' && !q.replied) ||
+                (currentFilter === 'replied' && q.replied);
+
+            // Filter by search term
+            const matchesSearch =
+                !searchTerm ||
+                q.userId.toLowerCase().includes(searchTerm) ||
+                q.question.toLowerCase().includes(searchTerm);
+
+            return matchesFilter && matchesSearch;
+        });
+
+        renderQuestions();
+    }
+
+    // Handle search input
+    function handleSearch(e) {
+        const clearBtn = document.getElementById('clearBtn');
+        clearBtn.classList.toggle('visible', e.target.value.length > 0);
+        applyFilters();
+    }
+
+    // Clear search
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('clearBtn').classList.remove('visible');
+        applyFilters();
+    }
+
+    // Render questions list
+    function renderQuestions() {
+        const messagesList = document.getElementById('messagesList');
+
+        if (filteredQuestions.length === 0) {
+            messagesList.innerHTML = `
+                <div class="no-messages">
+                    <div class="empty-icon">📭</div>
+                    <p class="empty-text">Нет вопросов для отображения</p>
+                </div>
+            `;
+            return;
+        }
+
+        messagesList.innerHTML = filteredQuestions.map((q, idx) => `
+            <div class="message-card ${q.replied ? 'replied' : ''} ${selectedQuestion?.id === q.id ? 'active' : ''}"
+                 data-index="${idx}" onclick="selectQuestionByIndex(${idx})">
+                <div class="message-header">
+                    <div class="user-info">
+                        <div class="user-avatar">${getInitials(q.userId)}</div>
+                        <span class="user-id">${truncateUuid(q.userId)}</span>
+                    </div>
+                    <div class="message-meta">
+                        <span class="status-badge ${q.replied ? 'replied' : 'new'}">
+                            ${q.replied ? '✓ Отвечено' : '● Новый'}
+                        </span>
+                        <span class="message-time">${formatTime(q.createdAt)}</span>
+                    </div>
+                </div>
+                <div class="message-text">${escapeHtml(q.question)}</div>
+            </div>
+        `).join('');
+    }
+
+    // Select a question by index
+    function selectQuestionByIndex(index) {
+        selectedQuestion = filteredQuestions[index];
+        renderQuestionDetail();
+        renderQuestions(); // Re-render to update active state
+    }
+
+    // Render question detail panel
+    function renderQuestionDetail() {
+        const detailContent = document.getElementById('detailContent');
+
+        if (!selectedQuestion) {
+            detailContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p class="empty-text">Выберите вопрос из списка</p>
+                </div>
+            `;
+            return;
+        }
+
+        const isReplied = selectedQuestion.replied;
+
+        detailContent.innerHTML = `
+            <div class="question-detail">
+                <div class="detail-row">
+                    <div class="detail-label">ID Вопроса</div>
+                    <div class="detail-value"><strong>${selectedQuestion.id}</strong></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">User ID</div>
+                    <div class="detail-value"><strong>${selectedQuestion.userId}</strong></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Дата и время</div>
+                    <div class="detail-value">${formatDateTime(selectedQuestion.createdAt)}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Вопрос</div>
+                    <div class="detail-value">${escapeHtml(selectedQuestion.question)}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Статус</div>
+                    <div class="detail-value">
+                        <span class="status-badge ${isReplied ? 'replied' : 'new'}">
+                            ${isReplied ? '✓ Обработано' : '● Требует ответа'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reply-section">
+                <div class="detail-label">Ответ пользователю</div>
+                <div class="quick-replies">
+                    ${quickReplies.map((reply, idx) =>
+                        `<button class="quick-reply-btn" onclick="insertQuickReply(${idx})" ${isReplied ? 'disabled' : ''}>${reply}</button>`
+                    ).join('')}
+                </div>
+                <textarea
+                    class="reply-textarea"
+                    id="replyText"
+                    placeholder="Введите ваш ответ пользователю..."
+                    ${isReplied ? 'disabled' : ''}
+                ></textarea>
+                <div class="reply-actions">
+                    <button
+                        class="btn btn-primary"
+                        onclick="sendReply()"
+                        ${isReplied ? 'disabled' : ''}
+                    >
+                        📤 Отправить
+                    </button>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="clearReply()"
+                        ${isReplied ? 'disabled' : ''}
+                    >
+                        🗑️ Очистить
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Insert quick reply template
+    function insertQuickReply(index) {
+        const textarea = document.getElementById('replyText');
+        if (textarea && !textarea.disabled) {
+            textarea.value = quickReplies[index];
+            textarea.focus();
+        }
+    }
+
+    // Clear reply textarea
+    function clearReply() {
+        const textarea = document.getElementById('replyText');
+        if (textarea && !textarea.disabled) {
+            textarea.value = '';
+            textarea.focus();
+        }
+    }
+
+    // Send reply to backend
+    async function sendReply() {
+        const replyText = document.getElementById('replyText').value.trim();
+
+        if (!replyText) {
+            showToast('Пожалуйста, введите текст ответа', 'error');
+            return;
+        }
+
+        if (!selectedQuestion) {
+            showToast('Вопрос не выбран', 'error');
+            return;
+        }
+
+        try {
+            const url = `/admin/reply?id=${encodeURIComponent(selectedQuestion.id)}&answer=${encodeURIComponent(replyText)}`;
+
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            };
+
+            // Add CSRF token if available
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            showToast('Ответ успешно отправлен!', 'success');
+
+            // Update local state
+            selectedQuestion.replied = true;
+            const index = allQuestions.findIndex(q => q.id === selectedQuestion.id);
+            if (index !== -1) {
+                allQuestions[index].replied = true;
+            }
+
+            clearReply();
+            renderQuestionDetail();
+            applyFilters();
+            updateStats();
+
+        } catch (error) {
+            console.error('Error sending reply:', error);
+            showToast('Ошибка отправки ответа. Проверьте консоль.', 'error');
+        }
+    }
+
+    // Update statistics
+    function updateStats() {
+        document.getElementById('totalCount').textContent = allQuestions.length;
+        document.getElementById('newCount').textContent =
+            allQuestions.filter(q => !q.replied).length;
+        document.getElementById('repliedCount').textContent =
+            allQuestions.filter(q => q.replied).length;
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const msg = document.getElementById('toastMessage');
+
+        toast.className = `toast ${type} show`;
+        icon.textContent = type === 'success' ? '✓' : '⚠️';
+        msg.textContent = message;
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Utility functions
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function getInitials(uuid) {
+        return uuid.substring(0, 2).toUpperCase();
+    }
+
+    function truncateUuid(uuid) {
+        return uuid.length > 8 ? uuid.substring(0, 8) + '...' : uuid;
+    }
+
+    function formatTime(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'только что';
+        if (diffMins < 60) return `${diffMins} мин`;
+        if (diffHours < 24) return `${diffHours} ч`;
+        if (diffDays === 1) return 'вчера';
+        if (diffDays < 7) return `${diffDays} дн`;
+
+        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    }
+
+    function formatDateTime(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+</script>
+</body>
+</html>

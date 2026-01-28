@@ -1,7 +1,9 @@
 package com.assettracker.main.telegram_bot.events;
 
 import com.assettracker.main.telegram_bot.database.dto.BagDto;
+import com.assettracker.main.telegram_bot.database.entity.UserStatus;
 import com.assettracker.main.telegram_bot.database.service.BagService;
+import com.assettracker.main.telegram_bot.database.service.UserService;
 import com.assettracker.main.telegram_bot.menu.ai_advice_menu.AIAdviceMenu;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.AssetDo;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.AssetListMenu;
@@ -16,6 +18,7 @@ import com.assettracker.main.telegram_bot.menu.incorrect_update_asset_menu.Incor
 import com.assettracker.main.telegram_bot.menu.main_menu.MainMenu;
 import com.assettracker.main.telegram_bot.menu.my_assets_menu.MyAssetsMenu;
 import com.assettracker.main.telegram_bot.menu.my_profile_menu.MyProfileMenu;
+import com.assettracker.main.telegram_bot.menu.support_menu.SupportMenu;
 import com.assettracker.main.telegram_bot.menu.trade_with_ai_menu.TradeWithAIMenu;
 import com.assettracker.main.telegram_bot.menu.waiting_menu.WaitingMenu;
 import com.assettracker.main.telegram_bot.service.AssetService;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 public class ButtonEventHandler {
 
     private final BagMenu bagMenu;
+    private final UserService userService;
     private final LastMessageService lastMessageService;
     private final MyAssetsMenu myAssetsMenu;
     private final BagService bagService;
@@ -48,6 +52,7 @@ public class ButtonEventHandler {
     private final AssetStatisticsMenu assetStatisticsMenu;
     private final TradeWithAIMenu tradeWithAIMenu;
     private final AIAdviceMenu aiAdviceMenu;
+    private final SupportMenu supportMenu;
 
     @EventListener(condition = "event.getButton.name() == 'MY_BAG'")
     public void handleMyBag(ButtonEvent event) {
@@ -104,6 +109,11 @@ public class ButtonEventHandler {
 
     @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_MENU'")
     public void handleCancelToMenu(ButtonEvent event) {
+        if (userService.isUserWriteQuestion(event.getChatId())) {
+            var user = userService.findByChatId(event.getChatId()).orElseThrow();
+            user.setStatus(UserStatus.FREE);
+            userService.saveUser(user);
+        }
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         mainMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
@@ -117,7 +127,6 @@ public class ButtonEventHandler {
 
     @EventListener(condition = "event.getButton().name() == 'CANCEL_TO_BAG_MENU'")
     public void handleCancelToBagMenu(ButtonEvent event) {
-        waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         bagMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
     }
@@ -165,6 +174,14 @@ public class ButtonEventHandler {
         waitingMenu.sendMenu(event.getChatId());
         Integer lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         aiAdviceMenu.editMsgAndSendMenu(event.getChatId(), lastMessageId);
+    }
+
+    @EventListener(condition = "event.getButton().name() == 'SUPPORT'")
+    public void handleSupport(ButtonEvent event) {
+        var user = userService.findByChatId(event.getChatId()).orElseThrow();
+        user.setStatus(UserStatus.WRITING_QUESTION);
+        userService.saveUser(user);
+        supportMenu.sendMenu(event.getChatId());
     }
 
     @EventListener

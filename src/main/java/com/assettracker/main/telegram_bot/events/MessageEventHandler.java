@@ -1,12 +1,16 @@
 package com.assettracker.main.telegram_bot.events;
 
+import com.assettracker.main.telegram_bot.database.dto.UserQuestionDto;
+import com.assettracker.main.telegram_bot.database.service.BagService;
+import com.assettracker.main.telegram_bot.database.service.DataInitializerService;
+import com.assettracker.main.telegram_bot.database.service.UserQuestionService;
+import com.assettracker.main.telegram_bot.database.service.UserService;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.UserCoin;
 import com.assettracker.main.telegram_bot.menu.bag_menu.BagMenu;
 import com.assettracker.main.telegram_bot.menu.enter_asset_count_menu.EnterAssetCountMenu;
 import com.assettracker.main.telegram_bot.menu.main_menu.MainMenu;
-import com.assettracker.main.telegram_bot.database.service.BagService;
-import com.assettracker.main.telegram_bot.database.service.DataInitializerService;
 import com.assettracker.main.telegram_bot.menu.my_profile_menu.MyProfileMenu;
+import com.assettracker.main.telegram_bot.menu.support_menu.SupportMenu;
 import com.assettracker.main.telegram_bot.menu.waiting_menu.WaitingMenu;
 import com.assettracker.main.telegram_bot.service.AssetService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
@@ -16,6 +20,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +30,8 @@ import java.util.concurrent.Executors;
 public class MessageEventHandler {
 
     private final ExecutorService es = Executors.newFixedThreadPool(10);
+    private final UserService userService;
+    private final UserQuestionService userQuestionService;
     private final MainMenu mainMenu;
     private final BagMenu bagMenu;
     private final BagService bagService;
@@ -34,12 +41,13 @@ public class MessageEventHandler {
     private final WaitingMenu waitingMenu;
     private final LastMessageService lastMessageService;
     private final MyProfileMenu myProfileMenu;
+    private final SupportMenu supportMenu;
 
     @EventListener(condition = "event.getMessage().name() == 'START'")
     public void handleStart(MessageEvent event) {
         var chatId = event.getUpdateDto().getChatId();
-        Integer lastMessageId = lastMessageService.getLastMessage(event.getUpdateDto().getChatId());
         waitingMenu.sendMenu(chatId);
+        Integer lastMessageId = lastMessageService.getLastMessage(event.getUpdateDto().getChatId());
         mainMenu.editMsgAndSendMenu(chatId, lastMessageId);
         es.execute(() -> {
             if (bagService.findByChatId(chatId).isEmpty()) {
@@ -75,6 +83,12 @@ public class MessageEventHandler {
             addAssetAndDeleteTmpUserCoin(event, chatId);
             enterAssetCountMenu.sendSuccess(chatId);
             bagMenu.sendMenu(chatId);
+        } else if (userService.isUserWriteQuestion(chatId)) {
+            UUID userId = userService.findByChatId(chatId).orElseThrow().getId();
+            userQuestionService.save(
+                    new UserQuestionDto(event.getUpdateDto().getUserInput().orElseThrow(), userId)
+            );
+            supportMenu.sendSuccess(chatId);
         }
     }
 

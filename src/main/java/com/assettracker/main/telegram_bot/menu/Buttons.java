@@ -18,6 +18,7 @@ public enum Buttons {
     MY_ASSETS("my_assets"),
     TRADE_WITH_AI("trade_with_ai"),
     AI_ADVICE("ai_advice"),
+    SUPPORT("support"),
     AI_QUESTION("ai_question"),
     CANCEL_TO_ASSETS("cancel_to_my_assets"),
     ASSET_STATISTICS("asset_statistics"),
