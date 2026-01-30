@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.menu.my_assets_menu;
 
-import com.assettracker.main.telegram_bot.menu.Buttons;
+import com.assettracker.main.telegram_bot.events.Button;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 public class DeleteAssetButon implements IMyAssetsMenuButton {
 
     @Getter
-    public final String DELETE_ASSET_BUTTON_CALLBACK_DATA = Buttons.DELETE_ASSET.getCallbackData();
+    public final String DELETE_ASSET_BUTTON_CALLBACK_DATA = Button.DELETE_ASSET.getCallbackData();
 
 
     @Override

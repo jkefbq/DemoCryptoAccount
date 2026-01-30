@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.database.entity;
 
-import com.assettracker.main.telegram_bot.dto.UpdateDto;
+import com.assettracker.main.telegram_bot.database.dto.UpdateDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

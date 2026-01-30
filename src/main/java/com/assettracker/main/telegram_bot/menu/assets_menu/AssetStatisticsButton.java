@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.menu.assets_menu;
 
-import com.assettracker.main.telegram_bot.menu.Buttons;
+import com.assettracker.main.telegram_bot.events.Button;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 public class AssetStatisticsButton implements IAssetsMenuButton {
 
     @Getter
-    private final String callbackData = Buttons.ASSET_STATISTICS.getCallbackData();
+    private final String callbackData = Button.ASSET_STATISTICS.getCallbackData();
 
     @Override
     public InlineKeyboardButton getButton() {

@@ -1,4 +1,4 @@
-package com.assettracker.main.telegram_bot.service;
+package com.assettracker.main.telegram_bot.database.service;
 
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.UserCoin;
 import com.assettracker.main.telegram_bot.database.entity.UserCoinEntity;

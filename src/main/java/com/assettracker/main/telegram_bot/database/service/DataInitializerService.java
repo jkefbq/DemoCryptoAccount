@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.database.service;
 
-import com.assettracker.main.telegram_bot.dto.UpdateDto;
+import com.assettracker.main.telegram_bot.database.dto.UpdateDto;
 import com.assettracker.main.telegram_bot.database.dto.BagDto;
 import com.assettracker.main.telegram_bot.database.entity.BagEntity;
 import com.assettracker.main.telegram_bot.database.entity.UserEntity;

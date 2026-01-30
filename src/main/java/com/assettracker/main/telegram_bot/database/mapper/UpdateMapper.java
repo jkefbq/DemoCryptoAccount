@@ -1,5 +1,6 @@
-package com.assettracker.main.telegram_bot.dto;
+package com.assettracker.main.telegram_bot.database.mapper;
 
+import com.assettracker.main.telegram_bot.database.dto.UpdateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.telegram.telegrambots.meta.api.objects.Update;

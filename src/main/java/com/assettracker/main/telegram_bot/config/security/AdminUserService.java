@@ -14,22 +14,20 @@ import java.util.Set;
 @Service
 public class AdminUserService implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
     private static final String USERNAME = "admin";
-    private final String password;
+    private final String encodePassword;
 
     public AdminUserService(
             PasswordEncoder passwordEncoder,
-            @Value("${ADMIN_PASSWORD}") String password
+            @Value("${ADMIN_PASSWORD:admin}") String password
     ) {
-        this.passwordEncoder = passwordEncoder;
-        this.password = password;
+        this.encodePassword = passwordEncoder.encode(password);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (username.equals(USERNAME)) {
-            return new User(username, passwordEncoder.encode(password),
+            return new User(username, encodePassword,
                     Set.of(new SimpleGrantedAuthority(UserRole.ADMIN.name())));
         } else {
             return null;

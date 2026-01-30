@@ -13,7 +13,7 @@ import com.assettracker.main.telegram_bot.menu.my_assets_menu.MyAssetsMenu;
 import com.assettracker.main.telegram_bot.menu.my_profile_menu.MyProfileMenu;
 import com.assettracker.main.telegram_bot.menu.support_menu.SupportMenu;
 import com.assettracker.main.telegram_bot.menu.waiting_menu.WaitingMenu;
-import com.assettracker.main.telegram_bot.service.AssetService;
+import com.assettracker.main.telegram_bot.database.service.AssetService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +48,7 @@ public class MessageEventHandler {
     @EventListener(condition = "event.getMessage().name() == 'START'")
     public void handleStart(MessageEvent event) {
         var chatId = event.getUpdateDto().getChatId();
-        waitingMenu.sendMenu(chatId);
-        Integer lastMessageId = lastMessageService.getLastMessage(event.getUpdateDto().getChatId());
-        mainMenu.editMsgAndSendMenu(chatId, lastMessageId);
+        mainMenu.sendMenu(chatId);
         es.execute(() -> {
             if (bagService.findByChatId(chatId).isEmpty()) {
                 initializer.initializeUserAndBag(event.getUpdateDto());
@@ -66,9 +64,8 @@ public class MessageEventHandler {
 
     @EventListener(condition = "event.getMessage().name() == 'BAG'")
     public void handleBag(MessageEvent event) {
-        waitingMenu.sendMenu(event.getUpdateDto().getChatId());
-        Integer lastMessageId = lastMessageService.getLastMessage(event.getUpdateDto().getChatId());
-        bagMenu.editMsgAndSendMenu(event.getUpdateDto().getChatId(), lastMessageId);
+        Long chatId = event.getUpdateDto().getChatId();
+        bagMenu.sendMenu(chatId);
     }
 
     @EventListener(condition = "event.getMessage().name() == 'PROFILE'")
@@ -82,16 +79,24 @@ public class MessageEventHandler {
     public void handleUnknown(MessageEvent event) {
         var chatId = event.getUpdateDto().getChatId();
         if (assetService.isUserWaitingNumber(chatId)) {
-            addAssetAndDeleteTmpUserCoin(event, chatId);
-            enterAssetCountMenu.sendSuccess(chatId);
-            myAssetsMenu.sendMenu(chatId);
+            addUserAssetAndSendSuccess(event, chatId);
         } else if (userService.isUserWriteQuestion(chatId)) {
-            UUID userId = userService.findByChatId(chatId).orElseThrow().getId();
-            userQuestionService.save(
-                    new UserQuestionDto(event.getUpdateDto().getUserInput().orElseThrow(), userId)
-            );
-            supportMenu.sendSuccess(chatId);
+            saveQuestionAndSendSuccess(event, chatId);
         }
+    }
+
+    private void saveQuestionAndSendSuccess(MessageEvent event, Long chatId) {
+        UUID userId = userService.findByChatId(chatId).orElseThrow().getId();
+        userQuestionService.save(
+                new UserQuestionDto(event.getUpdateDto().getUserInput().orElseThrow(), userId)
+        );
+        supportMenu.sendSuccess(chatId);
+    }
+
+    private void addUserAssetAndSendSuccess(MessageEvent event, Long chatId) {
+        addAssetAndDeleteTmpUserCoin(event, chatId);
+        enterAssetCountMenu.sendSuccess(chatId);
+        myAssetsMenu.sendMenu(chatId);
     }
 
     private void addAssetAndDeleteTmpUserCoin(MessageEvent event, Long chatId) {

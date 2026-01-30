@@ -61,7 +61,7 @@ public class SupportMenu implements IMenu {
     public void sendAnswer(Long chatId, String answer) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
-                .text("<b>Ответ от администратора:</b>\n\n" + answer)
+                .text("<b>Ответ от администратора:</b>\n<blockquote>" + answer + "</blockquote>")
                 .parseMode(ParseMode.HTML)
                 .build();
         Message msg = telegramClient.execute(sendMessage);

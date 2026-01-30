@@ -1,4 +1,4 @@
-package com.assettracker.main.telegram_bot.menu;
+package com.assettracker.main.telegram_bot.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 @AllArgsConstructor
-public enum Buttons {
+public enum Button {
     MY_BAG("my_bag"),
     MY_PROFILE("my_profile"),
     ANY_ASSET("any_asset"),
@@ -32,8 +32,8 @@ public enum Buttons {
     @Getter
     private final String callbackData;
 
-    public static Buttons parseCallbackData(String callbackData) {
-        return Arrays.stream(Buttons.values())
+    public static Button parseCallbackData(String callbackData) {
+        return Arrays.stream(Button.values())
                 .filter(button -> button.getCallbackData().equals(callbackData))
                 .findFirst()
                 .orElseThrow();

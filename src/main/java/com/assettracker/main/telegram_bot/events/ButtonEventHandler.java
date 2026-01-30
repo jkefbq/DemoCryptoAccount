@@ -21,7 +21,7 @@ import com.assettracker.main.telegram_bot.menu.my_profile_menu.MyProfileMenu;
 import com.assettracker.main.telegram_bot.menu.support_menu.SupportMenu;
 import com.assettracker.main.telegram_bot.menu.trade_with_ai_menu.TradeWithAIMenu;
 import com.assettracker.main.telegram_bot.menu.waiting_menu.WaitingMenu;
-import com.assettracker.main.telegram_bot.service.AssetService;
+import com.assettracker.main.telegram_bot.database.service.AssetService;
 import com.assettracker.main.telegram_bot.service.LastMessageService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -187,11 +187,11 @@ public class ButtonEventHandler {
     @EventListener
     public void handleAnyAssetButton(AssetButtonEvent event) {
         var tmpCoin = assetService.getTmpUserCoin(event.getChatId());
+        var lastMessageId = lastMessageService.getLastMessage(event.getChatId());
 
         tmpCoin.setCoin(event.getCoin());
         waitingMenu.editMsgAndSendMenu(event.getChatId(), lastMessageService.getLastMessage(event.getChatId()));
         assetService.saveTmpUserCoin(tmpCoin);
-        var lastMessageId = lastMessageService.getLastMessage(event.getChatId());
         processAsset(event, tmpCoin, lastMessageId);
     }
 

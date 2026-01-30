@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-public enum Messages {
+public enum Message {
     UNKNOWN(""),
     START("/start"),
     MENU("/menu"),
@@ -14,12 +14,12 @@ public enum Messages {
     @Getter
     private final String text;
 
-    Messages(String text) {
+    Message(String text) {
         this.text = text;
     }
 
-    public static Messages parseText(String text) {
-        return Arrays.stream(Messages.values())
+    public static Message parseText(String text) {
+        return Arrays.stream(Message.values())
                 .filter(msg -> msg.getText().equals(text))
                 .findFirst()
                 .orElseThrow();

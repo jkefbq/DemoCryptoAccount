@@ -19,7 +19,7 @@ public class SecurityConfig {
     private final AdminUserService adminUserService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())

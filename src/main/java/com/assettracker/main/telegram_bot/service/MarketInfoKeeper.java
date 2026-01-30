@@ -6,14 +6,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -22,56 +22,57 @@ import java.util.Set;
 @Service
 public class MarketInfoKeeper {
 
-
+    private final String KEY_HEADER = "x-cg-demo-api-key";
     private final String GECKO_KEY;
     private final String SIMPLE_PRICE_URL;
     private final ObjectMapper mapper;
+    private final RestTemplate restTemplate;
 
     public MarketInfoKeeper(
             @Value("${GECKO_KEY}") String GECKO_KEY,
             @Value("${api.url.simple-price}") String SIMPLE_PRICE_URL,
-            ObjectMapper mapper
+            ObjectMapper mapper, RestTemplate restTemplate
     ) {
         this.GECKO_KEY = GECKO_KEY;
         this.SIMPLE_PRICE_URL = SIMPLE_PRICE_URL;
         this.mapper = mapper;
+        this.restTemplate = restTemplate;
     }
 
-    public Map<Coins, BigDecimal> getCoinPrices(Set<Coins> coins)
-            throws IOException, InterruptedException {
+    public Map<Coins, BigDecimal> getCoinPrices(Set<Coins> coins) throws JsonProcessingException {
         String coinsIdsString = String.join(",", coins.stream().map(Coins::getIdsName).toList());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SIMPLE_PRICE_URL +
-                        "?vs_currencies=usd&precision=10&ids=" + coinsIdsString))
-                .header("x-cg-demo-api-key", GECKO_KEY)
-                .GET()
-                .build();
-        log.info("about to send https request to retrieve coin prices");
-        String json = HttpClient.newHttpClient()
-                .send(request, HttpResponse.BodyHandlers.ofString())
-                .body();
-        return toResultCoinPriceMap(json);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(KEY_HEADER, GECKO_KEY);
+        HttpEntity<String> http = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                SIMPLE_PRICE_URL + "?vs_currencies=usd&precision=10&ids=" + coinsIdsString,
+                HttpMethod.GET,
+                http,
+                String.class
+        );
+        return toResultCoinPriceMap(response.getBody());
     }
 
-    public Map<Coins, Map.Entry<BigDecimal, BigDecimal>> getCoinChanges(Set<Coins> coins)
-            throws IOException, InterruptedException {
+    /** returns Map[Coin, [change(%), price(usd)]] */
+    public Map<Coins, Map.Entry<BigDecimal, BigDecimal>> getCoinChanges(Set<Coins> coins) throws JsonProcessingException {
         String coinsIdsString = String.join(",", coins.stream().map(Coins::getIdsName).toList());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SIMPLE_PRICE_URL +
-                        "?vs_currencies=usd&precision=10&include_24hr_change=true&ids=" + coinsIdsString))
-                .header("x-cg-demo-api-key", GECKO_KEY)
-                .GET()
-                .build();
-        log.info("about to send https request to retrieve coin changes");
-        String json = HttpClient.newHttpClient()
-                .send(request, HttpResponse.BodyHandlers.ofString())
-                .body();
-        return toResultCoinChangeMap(json);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(KEY_HEADER, GECKO_KEY);
+        HttpEntity<String> http = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                SIMPLE_PRICE_URL + "?vs_currencies=usd&precision=10&include_24hr_change=true&ids=" + coinsIdsString,
+                HttpMethod.GET,
+                http,
+                String.class
+        );
+        return toResultCoinChangeMap(response.getBody());
     }
 
-    private Map<Coins, Map.Entry<BigDecimal, BigDecimal>> toResultCoinChangeMap(String json) throws JsonProcessingException {
+    private Map<Coins, Map.Entry<BigDecimal, BigDecimal>> toResultCoinChangeMap(
+            String json
+    ) throws JsonProcessingException {
         Map<Coins, Map.Entry<BigDecimal, BigDecimal>> result = new HashMap<>();
 
         JsonNode jsonNode = mapper.readTree(json);
@@ -83,7 +84,6 @@ public class MarketInfoKeeper {
                     )
             );
         });
-
         return result;
     }
 

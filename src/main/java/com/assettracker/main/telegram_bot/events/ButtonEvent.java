@@ -1,6 +1,5 @@
 package com.assettracker.main.telegram_bot.events;
 
-import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.context.ApplicationEvent;
@@ -9,11 +8,11 @@ import org.springframework.context.ApplicationEvent;
 public class ButtonEvent extends ApplicationEvent {
 
     @Getter
-    private final Buttons button;
+    private final Button button;
     @Getter
     private final Long chatId;
 
-    public ButtonEvent(Object source, Buttons button, Long chatId) {
+    public ButtonEvent(Object source, Button button, Long chatId) {
         super(source);
         this.button = button;
         this.chatId = chatId;

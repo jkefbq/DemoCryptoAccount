@@ -1,11 +1,11 @@
 package com.assettracker.main.telegram_bot.service;
 
+import com.assettracker.main.telegram_bot.events.AssetButtonEvent;
+import com.assettracker.main.telegram_bot.events.Button;
+import com.assettracker.main.telegram_bot.events.ButtonEvent;
 import com.assettracker.main.telegram_bot.menu.IButton;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.Coins;
 import com.assettracker.main.telegram_bot.menu.asset_list_menu.IAsset;
-import com.assettracker.main.telegram_bot.events.AssetButtonEvent;
-import com.assettracker.main.telegram_bot.events.ButtonEvent;
-import com.assettracker.main.telegram_bot.menu.Buttons;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,8 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ButtonHandler {
 
-    private final List<IButton> buttons;
-    private final AssetService assetService;
+    private final List<? extends IButton> buttons;
     private final ApplicationEventPublisher eventPublisher;
 
     public void handle(CallbackQuery callbackQuery) {
@@ -33,8 +32,8 @@ public class ButtonHandler {
                     log.info("about to publishing event with Coins={} and chatId={}", thisCoin, chatId);
                     eventPublisher.publishEvent(new AssetButtonEvent(this, thisCoin, chatId));
                 } else {
-                    Buttons thisButton = Buttons.parseCallbackData(callbackQuery.getData());
-                    log.info("about to publishing event with Buttons={} and chatId={}", thisButton, chatId);
+                    Button thisButton = Button.parseCallbackData(callbackQuery.getData());
+                    log.info("about to publishing event with Button={} and chatId={}", thisButton, chatId);
                     eventPublisher.publishEvent(new ButtonEvent(this, thisButton, chatId));
                 }
             }

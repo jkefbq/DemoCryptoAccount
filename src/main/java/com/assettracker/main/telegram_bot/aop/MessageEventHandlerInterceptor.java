@@ -1,7 +1,7 @@
 package com.assettracker.main.telegram_bot.aop;
 
 import com.assettracker.main.telegram_bot.events.MessageEvent;
-import com.assettracker.main.telegram_bot.service.AssetService;
+import com.assettracker.main.telegram_bot.database.service.AssetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;

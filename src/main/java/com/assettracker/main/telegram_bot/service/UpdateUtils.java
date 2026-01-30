@@ -1,8 +1,8 @@
 package com.assettracker.main.telegram_bot.service;
 
-import com.assettracker.main.telegram_bot.dto.UpdateDto;
-import com.assettracker.main.telegram_bot.dto.UpdateMapper;
-import com.assettracker.main.telegram_bot.dto.UpdateMapperImpl;
+import com.assettracker.main.telegram_bot.database.dto.UpdateDto;
+import com.assettracker.main.telegram_bot.database.mapper.UpdateMapper;
+import com.assettracker.main.telegram_bot.database.mapper.UpdateMapperImpl;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 

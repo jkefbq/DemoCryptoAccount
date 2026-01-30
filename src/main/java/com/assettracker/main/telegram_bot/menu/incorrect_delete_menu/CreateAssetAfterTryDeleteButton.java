@@ -1,6 +1,6 @@
 package com.assettracker.main.telegram_bot.menu.incorrect_delete_menu;
 
-import com.assettracker.main.telegram_bot.menu.Buttons;
+import com.assettracker.main.telegram_bot.events.Button;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -10,7 +10,7 @@ public class CreateAssetAfterTryDeleteButton implements IIncorrectDeleteMenuButt
 
     @Getter
     private final String CREATE_ASSET_AFTER_TRY_DELETE_CALLBACK_DATA =
-            Buttons.CREATE_ASSET_AFTER_TRY_DELETE.getCallbackData();
+            Button.CREATE_ASSET_AFTER_TRY_DELETE.getCallbackData();
 
     @Override
     public InlineKeyboardButton getButton() {
