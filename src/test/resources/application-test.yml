@@ -23,3 +23,6 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+
+TG_KEY: test
+DATABASE_HOST: localhost

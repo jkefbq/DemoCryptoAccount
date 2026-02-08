@@ -27,6 +27,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.telegram.telegrambots.longpolling.starter.TelegramBotInitializer;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -78,6 +79,8 @@ class BotApplicationTests {
     MarketInfoKeeper marketInfoKeeper;
     @MockitoBean
     AIService aiService;
+    @MockitoBean
+    TelegramBotInitializer telegramBotInitializer;
 
     @Autowired
     BagRepository bagRepository;
@@ -106,6 +109,9 @@ class BotApplicationTests {
         registry.add("spring.datasource.url", POSTGRES_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
+        registry.add("spring.liquibase.url", POSTGRES_CONTAINER::getJdbcUrl);
+        registry.add("spring.liquibase.user", POSTGRES_CONTAINER::getUsername);
+        registry.add("spring.liquibase.password", POSTGRES_CONTAINER::getPassword);
     }
 
     @DynamicPropertySource
