@@ -3,8 +3,8 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-green)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)
-![Core Coverage](https://img.shields.io/badge/Core%20Logic-88%25-brightgreen)
-![Controller Coverage](https://img.shields.io/badge/Controller-100%25-success)  
+![Core Coverage](https://img.shields.io/badge/Service%20Coverage-88%25-brightgreen)
+![Controller Coverage](https://img.shields.io/badge/Controller%20Coverage-100%25-success)  
 Telegram бот для криптотрейдинга с интеграцией нейросети и полноценной системой поддержки.
 Пользователи управляют портфелем в real-time: добавляют активы, отслеживают баланс, смотрят статистику. AI-помощник анализирует рынок и дает торговые рекомендации. Пользовательские вопросы автоматически попадают в защищенную admin-панель, где модератор может ответить — сообщение мгновенно улетает пользователю в чат. Под капотом: event-driven архитектура для масштабируемости, финансовые расчеты с precision-точностью, отказоустойчивое кэширование, хорошее покрытие тестами. Проект готов к деплою в любую среду с Docker.
 <details>
