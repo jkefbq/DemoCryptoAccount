@@ -1,0 +1,40 @@
+server:
+  port: ${SERVER_PORT:8080}
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:5432}/${DATABASE_NAME:asset_tracker}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:asset_tracker}
+  cache:
+    type: redis
+  output:
+    ansi:
+      enabled: ALWAYS
+api:
+  url:
+    simple-price: "https://api.coingecko.com/api/v3/simple/price"
+resilience4j.ratelimiter:
+  instances:
+    ai-advice:
+      limitForPeriod: 1
+      limit-refresh-period: 240s
+      timeoutDuration: 0s
